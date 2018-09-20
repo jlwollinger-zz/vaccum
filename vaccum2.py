@@ -16,9 +16,6 @@ class Bloco(Enum):
     LIMPO = 3
     ASPIRADOR = 4
 
-def agenteReativoSimples(percepcao):
-    return Acao.ACIMA
-
 def exibir(I):
     plt.imshow(I, 'gray')
     plt.show(block=False)
@@ -46,7 +43,7 @@ def gerarMundo():
 class Aspirador:
 
     LinhaAspirador = 0
-    ColunaInicialAspirador = 0
+    ColunaAspirador = 0
     Pontos = 0
     Mundo = ()
 
@@ -61,48 +58,37 @@ class Aspirador:
 
     def mover(self, acao):
         self.Pontos += 1
-        print("Pontos atuais: %", self.Pontos)
+        print("Minha posicao: ", self.LinhaAspirador, self.ColunaAspirador)
+        print("Pontos atuais: ", self.Pontos)
+        print("Movendo-se para ", acao)
         if acao == Acao.ABAIXO:
-            print(acao)
-            if (self.LinhaAspirador+1 == 5):
-                self.VoltaCompleta = True
-                return
-            linha = list(self.Mundo[self.LinhaAspirador+1])
-            linha[1] = Bloco.ASPIRADOR.value
+            linha = list(self.Mundo[self.LinhaAspirador + 1])
+            linha[self.LinhaAspirador + 1] = Bloco.ASPIRADOR.value
             linha = tuple(linha)
-            self.Mundo[self.LinhaAspirador+1] = linha
-            self.LinhaAspirador = self.LinhaAspirador+1
-            self.ColunaAspirador = 1
-            
+            self.Mundo[self.LinhaAspirador + 1] = linha
+            self.LinhaAspirador = self.LinhaAspirador + 1
+            #self.ColunaAspirador = 1
         elif acao == Acao.ACIMA:
-            print(acao)
-            linha = list(self.Mundo[self.LinhaAspirador+1])
-            linha[1] = Bloco.ASPIRADOR.value
+            linha = list(self.Mundo[self.LinhaAspirador + 1])
+            linha[self.LinhaAspirador - 1] = Bloco.ASPIRADOR.value
             linha = tuple(linha)
-            self.Mundo[self.LinhaAspirador-1] = linha
-            self.LinhaAspirador = self.LinhaAspirador+1
-            self.ColunaAspirador = 1
+            self.Mundo[self.LinhaAspirador - 1] = linha
+            self.LinhaAspirador = self.LinhaAspirador - 1
+            #self.ColunaAspirador = 1
         elif acao == Acao.DIREITA:
-            print(acao)
             linha = list(self.Mundo[self.LinhaAspirador])
-            linha[self.ColunaAspirador-1] = Bloco.ASPIRADOR.value
+            linha[self.ColunaAspirador + 1] = Bloco.ASPIRADOR.value
             linha = tuple(linha)
             self.LinhaAspirador = self.LinhaAspirador
-            self.ColunaAspirador = self.ColunaAspirador+1
+            self.ColunaAspirador = self.ColunaAspirador + 1
             self.Mundo[self.LinhaAspirador] = linha
         elif acao == Acao.ESQUERDA:
-            print(acao)
-            if (self.Mundo[self.LinhaAspirador][self.ColunaAspirador+1] == Bloco.PAREDE.value):
-                self.VoltaCompleta = True
-                return
             linha = list(self.Mundo[self.LinhaAspirador])
-            linha[self.ColunaAspirador+1] = Bloco.ASPIRADOR.value
+            linha[self.ColunaAspirador - 1] = Bloco.ASPIRADOR.value
             linha = tuple(linha)
             self.LinhaAspirador = self.LinhaAspirador
-            self.ColunaAspirador = self.ColunaAspirador+1
-            self.Mundo[self.LinhaAspirador] = linha
-        elif acao == Acao.ASPIRAR:
-            print(acao)
+            self.ColunaAspirador = self.ColunaAspirador - 1
+            self.Mundo[self.LinhaAspirador] = linha    
         else:
             print("Acao nao implementada")
 
@@ -117,6 +103,7 @@ class Aspirador:
         return False
 
     def perceberMundo(self): 
+
         for i in range (1, 6):
             linhaTuple = self.Mundo[i]
             for j in linhaTuple:
@@ -134,15 +121,12 @@ class Aspirador:
 
     def aspirarBloco(self):
         print('Aspirando')
-        if (self.Mundo[self.LinhaAspirador][self.ColunaAspirador] == Bloco.PAREDE.value):
-            return
         linha = list(self.Mundo[self.LinhaAspirador])
         linha[self.ColunaAspirador] = Bloco.LIMPO.value
         linha = tuple(linha)
         self.Mundo[self.LinhaAspirador] = linha        
     
 def main():    
-
     plt.show()
     plt.pause(0.001)
     mundo = gerarMundo()
