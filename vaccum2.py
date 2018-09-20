@@ -8,6 +8,7 @@ class Acao(Enum):
     ESQUERDA = 3
     DIREITA = 4 
     ASPIRAR = 5
+    NOOP = 6
 
 class Bloco(Enum):
     PAREDE = 1
@@ -107,18 +108,19 @@ class Aspirador:
 
     def temSujeira(self):
         #if Bloco.SUJO.value in self.Mundo
-        for i in self.Mundo:
-            linha += 1
-            for j in self.Mundo[i]:
-                if self.Mundo[linha, j] == Bloco.SUJO.value:
+        for i in range (1, 6):
+            linhaTuple = self.Mundo[i]
+            for j in linhaTuple:
+                if j == Bloco.SUJO.value:
+                    print("Movendo-se para a sujeira ",i, j)
                     return True
         return False
 
     def perceberMundo(self): 
-        print('Percebendo o mundo, que mundo legaaal')
-        for i in self.Mundo:
-            for j in self.Mundo[i]:
-                if self.Mundo[i, j] == Bloco.SUJO.value:
+        for i in range (1, 6):
+            linhaTuple = self.Mundo[i]
+            for j in linhaTuple:
+                if j == Bloco.SUJO.value:
                     if (self.LinhaAspirador - i) > 0:
                         return Acao.ACIMA
                     elif (self.LinhaAspirador - i) < 0:
@@ -126,7 +128,8 @@ class Aspirador:
                     elif (self.ColunaAspirador - j) > 0:
                         return Acao.ESQUERDA
                     elif (self.ColunaAspirador - j < 0):
-                        return Acao.DIREITA 
+                        return Acao.DIREITA
+        return Acao.NOOP 
 
 
     def aspirarBloco(self):
