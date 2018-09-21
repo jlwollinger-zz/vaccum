@@ -52,6 +52,7 @@ class Aspirador:
         
         while self.temSujeira():
             plt.pause(0.001)
+            exibir(self.Mundo)
             acao = self.perceberMundo()
             self.mover(acao)
             self.aspirarBloco()
