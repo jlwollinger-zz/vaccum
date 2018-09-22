@@ -42,8 +42,8 @@ def gerarMundo():
 
 class Aspirador:
 
-    LinhaAspirador = 0
-    ColunaAspirador = 0
+    LinhaAspirador = 1
+    ColunaAspirador = 1
     Pontos = 0
     Mundo = ()
 
@@ -51,7 +51,7 @@ class Aspirador:
         self.Mundo = mundo
         
         while self.temSujeira():
-            plt.pause(0.001)
+            plt.pause(0.1)
             exibir(self.Mundo)
             acao = self.perceberMundo()
             self.mover(acao)
@@ -80,21 +80,19 @@ class Aspirador:
             linha = list(self.Mundo[self.LinhaAspirador])
             linha[self.ColunaAspirador + 1] = Bloco.ASPIRADOR.value
             linha = tuple(linha)
-            self.LinhaAspirador = self.LinhaAspirador
             self.ColunaAspirador = self.ColunaAspirador + 1
-            self.Mundo[self.LinhaAspirador] = linha
+            self.Mundo[self.ColunaAspirador] = linha
         elif acao == Acao.ESQUERDA:
             linha = list(self.Mundo[self.LinhaAspirador])
             linha[self.ColunaAspirador - 1] = Bloco.ASPIRADOR.value
             linha = tuple(linha)
             self.LinhaAspirador = self.LinhaAspirador
             self.ColunaAspirador = self.ColunaAspirador - 1
-            self.Mundo[self.LinhaAspirador] = linha    
+            self.Mundo[self.ColunaAspirador] = linha    
         else:
             print("Acao nao implementada")
 
     def temSujeira(self):
-        #if Bloco.SUJO.value in self.Mundo
         for i in range (1, 6):
             linhaTuple = self.Mundo[i]
             for j in linhaTuple:
@@ -104,7 +102,6 @@ class Aspirador:
         return False
 
     def perceberMundo(self): 
-
         for i in range (1, 6):
             linhaTuple = self.Mundo[i]
             for j in linhaTuple:
@@ -127,7 +124,7 @@ class Aspirador:
         linha = tuple(linha)
         self.Mundo[self.LinhaAspirador] = linha        
     
-def main():    
+def main():
     plt.show()
     plt.pause(0.001)
     mundo = gerarMundo()
