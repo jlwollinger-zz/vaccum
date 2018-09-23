@@ -33,7 +33,7 @@ def gerarMundo():
     matriz.resize(rows, cols)
     
     matriz = [(1, 1, 1, 1, 1, 1),
-              (1, matriz[0][0], matriz[0][1], matriz[0][2], matriz[0][3], 1),
+              (1, 4, matriz[0][1], matriz[0][2], matriz[0][3], 1),
               (1, matriz[1][0], matriz[1][1], matriz[1][2], matriz[1][3], 1),
               (1, matriz[2][0], matriz[2][1], matriz[2][2], matriz[2][3], 1),
               (1, matriz[3][0], matriz[3][1], matriz[3][2], matriz[3][3], 1),
@@ -46,15 +46,17 @@ class Aspirador:
     ColunaAspirador = 1
     Pontos = 0
     Mundo = ()
+    LinhaObjetivo = -1
+    ColunaObjetivo = -1
 
     def acionar(self, mundo):
         self.Mundo = mundo
         
         while self.temSujeira():
-            plt.pause(0.1)
-            exibir(self.Mundo)
             acao = self.perceberMundo()
             self.mover(acao)
+            plt.pause(0.1)
+            exibir(self.Mundo)
             self.aspirarBloco()
 
     def mover(self, acao):
@@ -62,33 +64,36 @@ class Aspirador:
         print("Minha posicao: ", self.LinhaAspirador, self.ColunaAspirador)
         print("Pontos atuais: ", self.Pontos)
         print("Movendo-se para ", acao)
+        
+        linha = list(self.Mundo[self.LinhaAspirador])
+        linha[self.ColunaAspirador] = Bloco.LIMPO.value
+        linha = tuple(linha)
+        self.Mundo[self.LinhaAspirador] = linha
+
         if acao == Acao.ABAIXO:
-            linha = list(self.Mundo[self.LinhaAspirador + 1])
-            linha[self.LinhaAspirador + 1] = Bloco.ASPIRADOR.value
-            linha = tuple(linha)
-            self.Mundo[self.LinhaAspirador + 1] = linha
             self.LinhaAspirador = self.LinhaAspirador + 1
-            #self.ColunaAspirador = 1
+            linha = list(self.Mundo[self.LinhaAspirador])
+            linha[self.ColunaAspirador] = Bloco.ASPIRADOR.value
+            linha = tuple(linha)
+            self.Mundo[self.LinhaAspirador] = linha            
         elif acao == Acao.ACIMA:
-            linha = list(self.Mundo[self.LinhaAspirador + 1])
-            linha[self.LinhaAspirador - 1] = Bloco.ASPIRADOR.value
-            linha = tuple(linha)
-            self.Mundo[self.LinhaAspirador - 1] = linha
             self.LinhaAspirador = self.LinhaAspirador - 1
-            #self.ColunaAspirador = 1
+            linha = list(self.Mundo[self.LinhaAspirador])
+            linha[self.ColunaAspirador] = Bloco.ASPIRADOR.value
+            linha = tuple(linha)
+            self.Mundo[self.LinhaAspirador] = linha            
         elif acao == Acao.DIREITA:
-            linha = list(self.Mundo[self.LinhaAspirador])
-            linha[self.ColunaAspirador + 1] = Bloco.ASPIRADOR.value
-            linha = tuple(linha)
             self.ColunaAspirador = self.ColunaAspirador + 1
-            self.Mundo[self.ColunaAspirador] = linha
-        elif acao == Acao.ESQUERDA:
             linha = list(self.Mundo[self.LinhaAspirador])
-            linha[self.ColunaAspirador - 1] = Bloco.ASPIRADOR.value
-            linha = tuple(linha)
-            self.LinhaAspirador = self.LinhaAspirador
+            linha[self.ColunaAspirador] = Bloco.ASPIRADOR.value
+            linha = tuple(linha)            
+            self.Mundo[self.LinhaAspirador] = linha
+        elif acao == Acao.ESQUERDA:
             self.ColunaAspirador = self.ColunaAspirador - 1
-            self.Mundo[self.ColunaAspirador] = linha    
+            linha = list(self.Mundo[self.LinhaAspirador])
+            linha[self.ColunaAspirador] = Bloco.ASPIRADOR.value
+            linha = tuple(linha)            
+            self.Mundo[self.LinhaAspirador] = linha    
         else:
             print("Acao nao implementada")
 
@@ -102,10 +107,11 @@ class Aspirador:
         return False
 
     def perceberMundo(self): 
-        for i in range (1, 6):
+        for i in range (0, 5):
             linhaTuple = self.Mundo[i]
-            for j in linhaTuple:
-                if j == Bloco.SUJO.value:
+            for j in range (0, 5):
+                if linhaTuple[j] == Bloco.SUJO.value and self.ehBlocoDefinidoComoObjetivo(i, j):
+                    self.definirObjetivo(i, j)
                     if (self.LinhaAspirador - i) > 0:
                         return Acao.ACIMA
                     elif (self.LinhaAspirador - i) < 0:
@@ -116,13 +122,24 @@ class Aspirador:
                         return Acao.DIREITA
         return Acao.NOOP 
 
+    def definirObjetivo(self, linha, coluna):
+        self.LinhaObjetivo = linha
+        self.ColunaObjetivo = coluna
+
+    def ehBlocoDefinidoComoObjetivo(self, linha, coluna):
+        objetivoJaDefinido = self.LinhaObjetivo > -1
+        ehBlocoDefinidoComoObjetivo = self.LinhaObjetivo == linha and self.ColunaObjetivo == coluna
+        return ehBlocoDefinidoComoObjetivo or (not objetivoJaDefinido)
 
     def aspirarBloco(self):
         print('Aspirando')
         linha = list(self.Mundo[self.LinhaAspirador])
         linha[self.ColunaAspirador] = Bloco.LIMPO.value
         linha = tuple(linha)
-        self.Mundo[self.LinhaAspirador] = linha        
+        self.Mundo[self.LinhaAspirador] = linha
+        if (self.ColunaAspirador == self.ColunaObjetivo) and (self.LinhaAspirador == self.LinhaObjetivo):
+            self.LinhaObjetivo = -1
+            self.ColunaObjetivo = -1    
     
 def main():
     plt.show()
